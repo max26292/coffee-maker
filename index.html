@@ -819,7 +819,9 @@ function buildTables(coffee, water, sweetness, body) {
   const kP1Ratio = 0.65 - (sweetness / 100) * 0.35;
 
   // ── KASUYA ──
-  const kFlavorTotal = Math.round(water * 0.4);
+  // body 0–100 → flavor phase 45% (light) → 35% (full), strength phase gets the rest
+  const kFlavorRatio = 0.45 - (body / 100) * 0.10;
+  const kFlavorTotal = Math.round(water * kFlavorRatio);
   const kStrengthTotal = water - kFlavorTotal;
   const kP1 = Math.round(kFlavorTotal * kP1Ratio);
   const kP2 = kFlavorTotal - kP1;
@@ -836,7 +838,8 @@ function buildTables(coffee, water, sweetness, body) {
   kRows.forEach(([g, t, n], i) => { kCum += g; kHtml += row(i+1, g, kCum, water, t, n, false); });
   document.getElementById('tbl-kasuya').innerHTML = kHtml;
   document.getElementById('k-tbl-sub').textContent  = `${coffeeStr} coffee · ${waterStr} water`;
-  document.getElementById('k-tbl-foot').textContent = `Total: ${waterStr} · Flavor 40% (${kFlavorTotal}g) · Strength 60% (${kStrengthTotal}g)`;
+  const kFlavorPct = Math.round(kFlavorRatio * 100);
+  document.getElementById('k-tbl-foot').textContent = `Total: ${waterStr} · Flavor ${kFlavorPct}% (${kFlavorTotal}g) · Strength ${100 - kFlavorPct}% (${kStrengthTotal}g)`;
   document.getElementById('k-coffee').textContent = coffeeStr;
   document.getElementById('k-water').textContent  = waterStr;
 
