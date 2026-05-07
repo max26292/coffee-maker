@@ -1,0 +1,854 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>V60 Brew Guide — Championship Methods</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Mono:wght@300;400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --cream: #F5F0E8;
+    --espresso: #1A0F07;
+    --caramel: #C4883F;
+    --gold: #D4A853;
+    --font-display: 'Playfair Display', Georgia, serif;
+    --font-mono: 'DM Mono', monospace;
+    --font-sans: 'DM Sans', sans-serif;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--espresso);
+    color: var(--cream);
+    font-family: var(--font-sans);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='1'/%3E%3C/svg%3E");
+    opacity: 0.03;
+    pointer-events: none;
+    z-index: 1000;
+  }
+
+  /* HERO */
+  header {
+    padding: 5rem 2rem 4rem;
+    text-align: center;
+    position: relative;
+    border-bottom: 1px solid rgba(196,136,63,0.2);
+  }
+  header::after {
+    content: '';
+    position: absolute;
+    bottom: -1px; left: 50%; transform: translateX(-50%);
+    width: 80px; height: 2px;
+    background: var(--caramel);
+  }
+  .eyebrow {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    letter-spacing: 0.3em;
+    color: var(--caramel);
+    text-transform: uppercase;
+    margin-bottom: 1.2rem;
+    opacity: 0;
+    animation: fadeUp 0.6s ease forwards 0.1s;
+  }
+  h1 {
+    font-family: var(--font-display);
+    font-size: clamp(2.8rem, 7vw, 5rem);
+    font-weight: 400;
+    line-height: 1.1;
+    color: var(--cream);
+    margin-bottom: 1rem;
+    opacity: 0;
+    animation: fadeUp 0.7s ease forwards 0.25s;
+  }
+  h1 em { color: var(--gold); font-style: italic; }
+  .hero-sub {
+    font-size: 0.95rem;
+    color: rgba(245,240,232,0.5);
+    font-weight: 300;
+    opacity: 0;
+    animation: fadeUp 0.7s ease forwards 0.4s;
+  }
+
+  main { max-width: 1100px; margin: 0 auto; padding: 0 1.5rem 6rem; }
+
+  .section-label {
+    font-family: var(--font-mono);
+    font-size: 0.65rem;
+    letter-spacing: 0.25em;
+    color: var(--caramel);
+    text-transform: uppercase;
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+  .section-label::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: rgba(196,136,63,0.25);
+  }
+
+  /* CALCULATOR */
+  .calculator-section {
+    margin: 4rem 0 2rem;
+    opacity: 0;
+    animation: fadeUp 0.7s ease forwards 0.5s;
+  }
+  .calculator {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(196,136,63,0.18);
+    border-radius: 2px;
+    padding: 2rem 2.5rem 2.5rem;
+  }
+  .calc-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+    margin-bottom: 2rem;
+  }
+  @media (max-width: 600px) { .calc-grid { grid-template-columns: 1fr; } }
+
+  .input-group label {
+    display: block;
+    font-family: var(--font-mono);
+    font-size: 0.65rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: rgba(245,240,232,0.45);
+    margin-bottom: 0.75rem;
+  }
+  .input-row {
+    display: flex;
+    align-items: center;
+    background: rgba(0,0,0,0.25);
+    border: 1px solid rgba(196,136,63,0.2);
+    border-radius: 2px;
+    overflow: hidden;
+    transition: border-color 0.2s;
+  }
+  .input-row:focus-within { border-color: var(--caramel); }
+  .input-row input[type="number"] {
+    flex: 1;
+    background: transparent;
+    border: none;
+    outline: none;
+    color: var(--cream);
+    font-family: var(--font-mono);
+    font-size: 1.4rem;
+    font-weight: 400;
+    padding: 0.9rem 1rem;
+    width: 100%;
+    -moz-appearance: textfield;
+  }
+  .input-row input::-webkit-inner-spin-button,
+  .input-row input::-webkit-outer-spin-button { -webkit-appearance: none; }
+  .input-unit {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    color: var(--caramel);
+    padding: 0 1rem;
+    border-left: 1px solid rgba(196,136,63,0.2);
+    white-space: nowrap;
+  }
+  .ratio-picker { display: flex; }
+  .ratio-btn {
+    flex: 1;
+    background: rgba(0,0,0,0.25);
+    border: 1px solid rgba(196,136,63,0.2);
+    border-right: none;
+    color: rgba(245,240,232,0.5);
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    padding: 0.9rem 0.5rem;
+    cursor: pointer;
+    transition: all 0.15s;
+    text-align: center;
+  }
+  .ratio-btn:last-child { border-right: 1px solid rgba(196,136,63,0.2); }
+  .ratio-btn:hover { background: rgba(196,136,63,0.1); color: var(--cream); }
+  .ratio-btn.active { background: var(--caramel); color: var(--espresso); font-weight: 500; border-color: var(--caramel); }
+
+  .calc-results {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 1px;
+    background: rgba(196,136,63,0.15);
+    border: 1px solid rgba(196,136,63,0.15);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+  .result-card {
+    background: rgba(26,15,7,0.95);
+    padding: 1.2rem 1rem;
+    text-align: center;
+  }
+  .result-card .val {
+    font-family: var(--font-mono);
+    font-size: 1.7rem;
+    font-weight: 300;
+    color: var(--gold);
+    display: block;
+    margin-bottom: 0.2rem;
+    line-height: 1;
+  }
+  .result-card .unit {
+    font-family: var(--font-mono);
+    font-size: 0.55rem;
+    letter-spacing: 0.15em;
+    color: rgba(245,240,232,0.3);
+    text-transform: uppercase;
+    display: block;
+    margin-bottom: 0.3rem;
+  }
+  .result-card .desc { font-size: 0.72rem; color: rgba(245,240,232,0.4); }
+
+  /* RECIPES */
+  .recipes-section {
+    margin-top: 3rem;
+    opacity: 0;
+    animation: fadeUp 0.7s ease forwards 0.7s;
+  }
+  .recipe-tabs {
+    display: flex;
+    border-bottom: 1px solid rgba(196,136,63,0.2);
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .recipe-tabs::-webkit-scrollbar { display: none; }
+  .recipe-tab {
+    background: none;
+    border: none;
+    border-bottom: 2px solid transparent;
+    color: rgba(245,240,232,0.35);
+    font-family: var(--font-sans);
+    font-size: 0.8rem;
+    padding: 1rem 1.5rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+    margin-bottom: -1px;
+  }
+  .recipe-tab:hover { color: rgba(245,240,232,0.7); }
+  .recipe-tab.active { color: var(--cream); border-bottom-color: var(--caramel); }
+
+  .recipe-panel { display: none; padding: 2.5rem 0 0; }
+  .recipe-panel.active { display: block; }
+
+  .recipe-meta {
+    display: flex;
+    flex-wrap: wrap;
+    border: 1px solid rgba(196,136,63,0.15);
+    border-radius: 2px;
+    overflow: hidden;
+    margin-bottom: 2.5rem;
+  }
+  .meta-item {
+    flex: 1;
+    min-width: 90px;
+    padding: 1rem;
+    border-right: 1px solid rgba(196,136,63,0.15);
+    text-align: center;
+  }
+  .meta-item:last-child { border-right: none; }
+  .meta-val {
+    font-family: var(--font-mono);
+    font-size: 1rem;
+    color: var(--cream);
+    display: block;
+    margin-bottom: 0.25rem;
+  }
+  .meta-val.dyn { color: var(--gold); }
+  .meta-label {
+    font-family: var(--font-mono);
+    font-size: 0.55rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: rgba(245,240,232,0.35);
+  }
+
+  /* TWO-COLUMN BODY */
+  .recipe-body {
+    display: grid;
+    grid-template-columns: 1fr 380px;
+    gap: 3rem;
+    align-items: start;
+  }
+  @media (max-width: 820px) { .recipe-body { grid-template-columns: 1fr; } }
+
+  /* STEPS */
+  .steps { display: flex; flex-direction: column; }
+  .step {
+    display: grid;
+    grid-template-columns: 48px 1fr;
+    border-bottom: 1px solid rgba(196,136,63,0.1);
+    padding: 1.2rem 0;
+  }
+  .step:last-child { border-bottom: none; }
+  .step-num {
+    font-family: var(--font-mono);
+    font-size: 0.6rem;
+    letter-spacing: 0.1em;
+    color: rgba(196,136,63,0.4);
+    padding-top: 0.2rem;
+  }
+  .step-title {
+    font-family: var(--font-display);
+    font-size: 0.98rem;
+    color: var(--cream);
+    margin-bottom: 0.35rem;
+  }
+  .step-desc {
+    font-size: 0.83rem;
+    line-height: 1.7;
+    color: rgba(245,240,232,0.5);
+    font-weight: 300;
+  }
+  .step-timing {
+    font-family: var(--font-mono);
+    font-size: 0.58rem;
+    letter-spacing: 0.08em;
+    color: var(--caramel);
+    margin-top: 0.45rem;
+    text-transform: uppercase;
+  }
+  .tip {
+    margin-top: 1.5rem;
+    border-left: 2px solid var(--caramel);
+    padding: 0.9rem 1.2rem;
+    background: rgba(196,136,63,0.05);
+  }
+  .tip-label {
+    font-family: var(--font-mono);
+    font-size: 0.58rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--caramel);
+    margin-bottom: 0.35rem;
+  }
+  .tip-text {
+    font-size: 0.82rem;
+    line-height: 1.7;
+    color: rgba(245,240,232,0.45);
+    font-weight: 300;
+  }
+
+  /* BREW TABLE */
+  .brew-table-wrap { position: sticky; top: 2rem; }
+  .brew-table-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 0.9rem;
+  }
+  .brew-table-label {
+    font-family: var(--font-mono);
+    font-size: 0.6rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--caramel);
+  }
+  .brew-table-sub {
+    font-family: var(--font-mono);
+    font-size: 0.6rem;
+    color: rgba(245,240,232,0.25);
+    letter-spacing: 0.05em;
+  }
+  .brew-table {
+    width: 100%;
+    border-collapse: collapse;
+    border: 1px solid rgba(196,136,63,0.15);
+    border-radius: 2px;
+    overflow: hidden;
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+  }
+  .brew-table thead tr { background: rgba(196,136,63,0.1); }
+  .brew-table th {
+    font-size: 0.55rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: rgba(245,240,232,0.35);
+    padding: 0.6rem 0.8rem;
+    text-align: left;
+    font-weight: 400;
+    border-bottom: 1px solid rgba(196,136,63,0.15);
+  }
+  .brew-table td {
+    padding: 0.65rem 0.8rem;
+    border-bottom: 1px solid rgba(196,136,63,0.07);
+    vertical-align: middle;
+  }
+  .brew-table tr:last-child td { border-bottom: none; }
+  .brew-table tbody tr:hover td { background: rgba(255,255,255,0.02); }
+  .td-step { color: rgba(196,136,63,0.5); font-size: 0.62rem; }
+  .td-time { color: rgba(245,240,232,0.4); font-size: 0.7rem; }
+  .td-note { color: rgba(245,240,232,0.35); font-size: 0.68rem; font-family: var(--font-sans); }
+  .td-special { color: rgba(196,136,63,0.6); font-size: 0.68rem; font-family: var(--font-sans); font-style: italic; }
+  /* pour bar cell */
+  .pour-cell { display: flex; align-items: center; gap: 7px; }
+  .pour-val { color: var(--gold); font-weight: 500; min-width: 34px; }
+  .pour-bar-track {
+    flex: 1;
+    height: 3px;
+    background: rgba(255,255,255,0.06);
+    border-radius: 2px;
+    overflow: hidden;
+    min-width: 40px;
+    max-width: 80px;
+  }
+  .pour-bar-fill {
+    height: 100%;
+    border-radius: 2px;
+    background: var(--caramel);
+    transition: width 0.3s ease;
+  }
+  /* cumul cell */
+  .cumul-cell { display: flex; align-items: center; gap: 6px; }
+  .cumul-val { color: var(--cream); min-width: 34px; }
+  .cumul-pct { font-size: 0.6rem; color: rgba(245,240,232,0.25); }
+  .brew-table tfoot td {
+    background: rgba(196,136,63,0.07);
+    border-top: 1px solid rgba(196,136,63,0.18);
+    color: rgba(196,136,63,0.7);
+    font-size: 0.68rem;
+    padding: 0.65rem 0.8rem;
+  }
+
+  footer {
+    text-align: center;
+    padding: 2rem;
+    border-top: 1px solid rgba(196,136,63,0.12);
+    font-family: var(--font-mono);
+    font-size: 0.6rem;
+    letter-spacing: 0.2em;
+    color: rgba(245,240,232,0.2);
+    text-transform: uppercase;
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <p class="eyebrow">Championship Methods</p>
+  <h1>The <em>V60</em><br>Brew Guide</h1>
+  <p class="hero-sub">Four world-class methods. One perfect cup.</p>
+</header>
+
+<main>
+
+  <!-- CALCULATOR -->
+  <section class="calculator-section">
+    <p class="section-label">Brew Calculator</p>
+    <div class="calculator">
+      <div class="calc-grid">
+        <div class="input-group">
+          <label>Coffee dose</label>
+          <div class="input-row">
+            <input type="number" id="coffeeInput" value="20" min="5" max="60" step="0.5">
+            <span class="input-unit">g</span>
+          </div>
+        </div>
+        <div class="input-group">
+          <label>Ratio (coffee : water)</label>
+          <div class="ratio-picker" id="ratioPicker">
+            <button class="ratio-btn" data-ratio="13">1:13</button>
+            <button class="ratio-btn" data-ratio="15">1:15</button>
+            <button class="ratio-btn active" data-ratio="16">1:16</button>
+            <button class="ratio-btn" data-ratio="17">1:17</button>
+            <button class="ratio-btn" data-ratio="18">1:18</button>
+          </div>
+        </div>
+      </div>
+      <div class="calc-results">
+        <div class="result-card">
+          <span class="val" id="res-water">320</span>
+          <span class="unit">grams</span>
+          <span class="desc">Total water</span>
+        </div>
+        <div class="result-card">
+          <span class="val" id="res-bloom">40</span>
+          <span class="unit">grams</span>
+          <span class="desc">Bloom water (2×)</span>
+        </div>
+        <div class="result-card">
+          <span class="val" id="res-main">280</span>
+          <span class="unit">grams</span>
+          <span class="desc">Remaining water</span>
+        </div>
+        <div class="result-card">
+          <span class="val" id="res-pour5">64</span>
+          <span class="unit">grams</span>
+          <span class="desc">Per pour (÷5)</span>
+        </div>
+        <div class="result-card">
+          <span class="val" id="res-yield">272</span>
+          <span class="unit">ml approx</span>
+          <span class="desc">Yield in cup</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- RECIPES -->
+  <section class="recipes-section">
+    <p class="section-label">Championship Recipes</p>
+    <div class="recipe-tabs">
+      <button class="recipe-tab active" data-panel="kasuya">Tetsu Kasuya — 4:6</button>
+      <button class="recipe-tab" data-panel="hoffmann">James Hoffmann</button>
+      <button class="recipe-tab" data-panel="rao">Scott Rao</button>
+      <button class="recipe-tab" data-panel="winton">Matt Winton</button>
+    </div>
+
+    <!-- ── KASUYA ── -->
+    <div class="recipe-panel active" id="panel-kasuya">
+      <div class="recipe-meta">
+        <div class="meta-item"><span class="meta-val dyn" id="k-coffee">20g</span><span class="meta-label">Coffee</span></div>
+        <div class="meta-item"><span class="meta-val dyn" id="k-water">320g</span><span class="meta-label">Water</span></div>
+        <div class="meta-item"><span class="meta-val">88–93°C</span><span class="meta-label">Temp</span></div>
+        <div class="meta-item"><span class="meta-val">Coarse</span><span class="meta-label">Grind</span></div>
+        <div class="meta-item"><span class="meta-val">~3:30</span><span class="meta-label">Total time</span></div>
+        <div class="meta-item"><span class="meta-val">2016 WBrC</span><span class="meta-label">Champion</span></div>
+      </div>
+      <div class="recipe-body">
+        <div>
+          <div class="steps">
+            <div class="step"><span class="step-num">01</span><div>
+              <p class="step-title">Rinse & prep</p>
+              <p class="step-desc">Rinse paper filter with hot water, discard. Add coffee at a coarse grind, level the bed. No pre-wetting bloom — Kasuya goes straight into timed pours.</p>
+            </div></div>
+            <div class="step"><span class="step-num">02</span><div>
+              <p class="step-title">Flavor phase — pours 1 & 2</p>
+              <p class="step-desc">The first 40% of total water controls flavor. Smaller pour 1 = sweeter. Larger pour 1 = more acidity. Let the bed drain nearly completely between pours.</p>
+              <p class="step-timing">0:00 and 0:45</p>
+            </div></div>
+            <div class="step"><span class="step-num">03</span><div>
+              <p class="step-title">Strength phase — pours 3, 4 & 5</p>
+              <p class="step-desc">The remaining 60% of water controls strength and body. The concentration resets each drain, extracting cleanly across three final equal pours.</p>
+              <p class="step-timing">1:30 / 2:15 / 3:00 → drawdown by 3:30</p>
+            </div></div>
+          </div>
+          <div class="tip">
+            <p class="tip-label">Sweetness dial</p>
+            <p class="tip-text">Want sweeter? Make pour 1 smaller (e.g. 40g) and pour 2 larger. Want more acidity? Invert it. This flexible 4:6 framework won Kasuya the 2016 World Brewers Cup.</p>
+          </div>
+        </div>
+        <div class="brew-table-wrap">
+          <div class="brew-table-header">
+            <p class="brew-table-label">Pour-by-pour brew table</p>
+            <p class="brew-table-sub" id="k-tbl-sub">20g coffee · 320g water</p>
+          </div>
+          <table class="brew-table">
+            <thead><tr><th>#</th><th>Pour</th><th>Cumulative</th><th>At</th><th>Notes</th></tr></thead>
+            <tbody id="tbl-kasuya"></tbody>
+            <tfoot><tr><td colspan="5" id="k-tbl-foot">Total: 320g · Drawdown ~3:30</td></tr></tfoot>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── HOFFMANN ── -->
+    <div class="recipe-panel" id="panel-hoffmann">
+      <div class="recipe-meta">
+        <div class="meta-item"><span class="meta-val dyn" id="h-coffee">20g</span><span class="meta-label">Coffee</span></div>
+        <div class="meta-item"><span class="meta-val dyn" id="h-water">320g</span><span class="meta-label">Water</span></div>
+        <div class="meta-item"><span class="meta-val">100°C</span><span class="meta-label">Temp</span></div>
+        <div class="meta-item"><span class="meta-val">Med-fine</span><span class="meta-label">Grind</span></div>
+        <div class="meta-item"><span class="meta-val">~3:30</span><span class="meta-label">Total time</span></div>
+        <div class="meta-item"><span class="meta-val">World Champ</span><span class="meta-label">Barista</span></div>
+      </div>
+      <div class="recipe-body">
+        <div>
+          <div class="steps">
+            <div class="step"><span class="step-num">01</span><div>
+              <p class="step-title">Rinse & prep</p>
+              <p class="step-desc">Rinse filter thoroughly with boiling water to preheat the dripper. Add coffee at a medium-fine grind (like coarse table salt). Shake gently to level.</p>
+            </div></div>
+            <div class="step"><span class="step-num">02</span><div>
+              <p class="step-title">Bloom — swirl immediately</p>
+              <p class="step-desc">Pour 2× coffee weight in boiling water, then immediately give the dripper a gentle swirl. The swirl eliminates dry pockets without agitating fines.</p>
+              <p class="step-timing">0:00 → wait until 0:45</p>
+            </div></div>
+            <div class="step"><span class="step-num">03</span><div>
+              <p class="step-title">Single continuous main pour</p>
+              <p class="step-desc">Pour all remaining water in one steady uninterrupted spiral, no pulses. Gentle and consistent. The high thermal mass of boiling water keeps slurry temperature stable throughout.</p>
+              <p class="step-timing">0:45 → finish by 1:30</p>
+            </div></div>
+            <div class="step"><span class="step-num">04</span><div>
+              <p class="step-title">Final swirl & drain</p>
+              <p class="step-desc">One final swirl to wash grounds off the filter walls and flatten the bed, then let drain completely.</p>
+              <p class="step-timing">~1:30 → drawdown by 3:30</p>
+            </div></div>
+          </div>
+          <div class="tip">
+            <p class="tip-label">On boiling water</p>
+            <p class="tip-text">Slurry temperature drops 10–15°C on contact — starting at 100°C means you brew at ~85–90°C. Never skip the filter rinse to pre-warm the dripper.</p>
+          </div>
+        </div>
+        <div class="brew-table-wrap">
+          <div class="brew-table-header">
+            <p class="brew-table-label">Pour-by-pour brew table</p>
+            <p class="brew-table-sub" id="h-tbl-sub">20g coffee · 320g water</p>
+          </div>
+          <table class="brew-table">
+            <thead><tr><th>#</th><th>Pour</th><th>Cumulative</th><th>At</th><th>Notes</th></tr></thead>
+            <tbody id="tbl-hoffmann"></tbody>
+            <tfoot><tr><td colspan="5" id="h-tbl-foot">Total: 320g · Drawdown ~3:30</td></tr></tfoot>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── RAO ── -->
+    <div class="recipe-panel" id="panel-rao">
+      <div class="recipe-meta">
+        <div class="meta-item"><span class="meta-val dyn" id="r-coffee">20g</span><span class="meta-label">Coffee</span></div>
+        <div class="meta-item"><span class="meta-val dyn" id="r-water">320g</span><span class="meta-label">Water</span></div>
+        <div class="meta-item"><span class="meta-val">97–100°C</span><span class="meta-label">Temp</span></div>
+        <div class="meta-item"><span class="meta-val">Med-fine</span><span class="meta-label">Grind</span></div>
+        <div class="meta-item"><span class="meta-val">~3:00</span><span class="meta-label">Total time</span></div>
+        <div class="meta-item"><span class="meta-val">Coffee Sci.</span><span class="meta-label">Author</span></div>
+      </div>
+      <div class="recipe-body">
+        <div>
+          <div class="steps">
+            <div class="step"><span class="step-num">01</span><div>
+              <p class="step-title">Rinse & prep</p>
+              <p class="step-desc">Rinse filter, discard. Add coffee at a medium-fine grind. Level the bed. Rao's philosophy: minimize all variables from the first step.</p>
+            </div></div>
+            <div class="step"><span class="step-num">02</span><div>
+              <p class="step-title">Excavated bloom</p>
+              <p class="step-desc">Pour bloom water, then immediately stir and physically dig into the grounds with a spoon — the "excavated bloom." Goal: 100% saturation, zero dry clumps. This is the defining Rao technique.</p>
+              <p class="step-timing">0:00 → wait 30–45 seconds</p>
+            </div></div>
+            <div class="step"><span class="step-num">03</span><div>
+              <p class="step-title">Single continuous pour</p>
+              <p class="step-desc">Pour all remaining water in one uninterrupted stream — vertical, non-turbulent, aimed at center, spiraling outward slowly. Consistency over the full pour duration is everything.</p>
+              <p class="step-timing">0:30 → finish by 1:30</p>
+            </div></div>
+            <div class="step"><span class="step-num">04</span><div>
+              <p class="step-title">The Rao Spin</p>
+              <p class="step-desc">A sharp, confident swirl immediately after pouring. Washes grounds off the filter walls and flattens the bed for uniform extraction to the last drop.</p>
+              <p class="step-timing">~1:30 → drawdown by ~3:00</p>
+            </div></div>
+          </div>
+          <div class="tip">
+            <p class="tip-label">Best for funky naturals</p>
+            <p class="tip-text">Reliably hits 22–24% extraction yield. Excels with natural-process and anaerobic coffees. The continuous pour rewards a steady, unhurried hand.</p>
+          </div>
+        </div>
+        <div class="brew-table-wrap">
+          <div class="brew-table-header">
+            <p class="brew-table-label">Pour-by-pour brew table</p>
+            <p class="brew-table-sub" id="r-tbl-sub">20g coffee · 320g water</p>
+          </div>
+          <table class="brew-table">
+            <thead><tr><th>#</th><th>Pour</th><th>Cumulative</th><th>At</th><th>Notes</th></tr></thead>
+            <tbody id="tbl-rao"></tbody>
+            <tfoot><tr><td colspan="5" id="r-tbl-foot">Total: 320g · Drawdown ~3:00</td></tr></tfoot>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── WINTON ── -->
+    <div class="recipe-panel" id="panel-winton">
+      <div class="recipe-meta">
+        <div class="meta-item"><span class="meta-val dyn" id="w-coffee">20g</span><span class="meta-label">Coffee</span></div>
+        <div class="meta-item"><span class="meta-val dyn" id="w-water">320g</span><span class="meta-label">Water</span></div>
+        <div class="meta-item"><span class="meta-val">90–93°C</span><span class="meta-label">Temp</span></div>
+        <div class="meta-item"><span class="meta-val">Coarse</span><span class="meta-label">Grind</span></div>
+        <div class="meta-item"><span class="meta-val">~3:30</span><span class="meta-label">Total time</span></div>
+        <div class="meta-item"><span class="meta-val">2021 WBrC</span><span class="meta-label">Champion</span></div>
+      </div>
+      <div class="recipe-body">
+        <div>
+          <div class="steps">
+            <div class="step"><span class="step-num">01</span><div>
+              <p class="step-title">Use a metal V60 — rinse & prep</p>
+              <p class="step-desc">Winton uses a metal Hario V60 for heat retention across all five pours. Rinse with boiling water to preheat. Add coffee at a very coarse grind — similar to French press. Level the bed.</p>
+            </div></div>
+            <div class="step"><span class="step-num">02</span><div>
+              <p class="step-title">Five equal pours — no bloom</p>
+              <p class="step-desc">Pour all five batches in slow concentric spirals from center outward. No separate bloom. Wait for the bed to drain nearly completely before each subsequent pour — this resets the concentration gradient each time, producing clarity without bitterness.</p>
+              <p class="step-timing">0:00 / 0:45 / 1:30 / 2:15 / 3:00</p>
+            </div></div>
+            <div class="step"><span class="step-num">03</span><div>
+              <p class="step-title">Final drawdown</p>
+              <p class="step-desc">The result: a remarkably bright, clear cup with low perceived acidity. Patient pours prevent channeling and produce exceptional clarity.</p>
+              <p class="step-timing">Full drawdown by 3:30</p>
+            </div></div>
+          </div>
+          <div class="tip">
+            <p class="tip-label">2021 World Brewers Cup — gold</p>
+            <p class="tip-text">The five equal pours with near-full drainage between each is the structural insight that won Winton gold. Each drain-and-reset extracts efficiently without over-extraction.</p>
+          </div>
+        </div>
+        <div class="brew-table-wrap">
+          <div class="brew-table-header">
+            <p class="brew-table-label">Pour-by-pour brew table</p>
+            <p class="brew-table-sub" id="w-tbl-sub">20g coffee · 320g water</p>
+          </div>
+          <table class="brew-table">
+            <thead><tr><th>#</th><th>Pour</th><th>Cumulative</th><th>At</th><th>Notes</th></tr></thead>
+            <tbody id="tbl-winton"></tbody>
+            <tfoot><tr><td colspan="5" id="w-tbl-foot">Total: 320g · Drawdown ~3:30</td></tr></tfoot>
+          </table>
+        </div>
+      </div>
+    </div>
+
+  </section>
+</main>
+
+<footer>
+  V60 Brew Guide &nbsp;·&nbsp; Championship Methods &nbsp;·&nbsp; Specialty Coffee
+</footer>
+
+<script>
+let currentRatio = 16;
+
+function row(num, pourG, cumG, totalG, time, note, special) {
+  const pct = Math.round((pourG / totalG) * 100);
+  const barW = Math.round((pourG / totalG) * 70);
+  const cumPct = Math.round((cumG / totalG) * 100);
+  const numCell = special
+    ? `<td class="td-step td-special">${num}</td>`
+    : `<td class="td-step">${String(num).padStart(2,'0')}</td>`;
+  const pourCell = special
+    ? `<td class="td-special" colspan="2">${note}</td>`
+    : `<td><div class="pour-cell">
+        <span class="pour-val">${pourG}g</span>
+        <div class="pour-bar-track"><div class="pour-bar-fill" style="width:${barW}px"></div></div>
+        <span style="font-size:0.6rem;color:rgba(245,240,232,0.2)">${pct}%</span>
+      </div></td>`;
+  const cumulCell = special
+    ? '' : `<td><div class="cumul-cell">
+        <span class="cumul-val">${cumG}g</span>
+        <span class="cumul-pct">${cumPct}%</span>
+      </div></td>`;
+  const timeCell = `<td class="td-time">${time}</td>`;
+  const noteCell = special ? '' : `<td class="td-note">${note}</td>`;
+  return `<tr>${numCell}${pourCell}${cumulCell}${timeCell}${noteCell}</tr>`;
+}
+
+function buildTables(coffee, water) {
+  const coffeeStr = (Math.round(coffee * 10) / 10) + 'g';
+  const waterStr  = water + 'g';
+
+  // ── KASUYA ──
+  const kFlavorTotal = Math.round(water * 0.4);
+  const kStrengthTotal = water - kFlavorTotal;
+  const kP1 = Math.round(kFlavorTotal * 0.45);   // slightly smaller first pour (default sweet)
+  const kP2 = kFlavorTotal - kP1;
+  const kPer = Math.round(kStrengthTotal / 3);
+  const kP5 = kStrengthTotal - kPer * 2;
+  const kRows = [
+    [kP1, '0:00', 'Flavor — smaller = sweeter'],
+    [kP2, '0:45', 'Flavor — larger = more acidity'],
+    [kPer,'1:30', 'Strength phase'],
+    [kPer,'2:15', 'Strength phase'],
+    [kP5, '3:00', 'Strength — final pour'],
+  ];
+  let kHtml = '', kCum = 0;
+  kRows.forEach(([g, t, n], i) => { kCum += g; kHtml += row(i+1, g, kCum, water, t, n, false); });
+  document.getElementById('tbl-kasuya').innerHTML = kHtml;
+  document.getElementById('k-tbl-sub').textContent  = `${coffeeStr} coffee · ${waterStr} water`;
+  document.getElementById('k-tbl-foot').textContent = `Total: ${waterStr} · Flavor 40% (${kFlavorTotal}g) · Strength 60% (${kStrengthTotal}g)`;
+  document.getElementById('k-coffee').textContent = coffeeStr;
+  document.getElementById('k-water').textContent  = waterStr;
+
+  // ── HOFFMANN ──
+  const hBloom = Math.round(coffee * 2);
+  const hMain  = water - hBloom;
+  let hHtml = '', hCum = 0;
+  [[hBloom,'0:00','Bloom — swirl dripper immediately'],[hMain,'0:45','Continuous pour — finish by 1:30']].forEach(([g,t,n],i) => {
+    hCum += g;
+    hHtml += row(i+1, g, hCum, water, t, n, false);
+  });
+  hHtml += row('↺','','','','~1:30','Swirl dripper to flatten bed',true);
+  document.getElementById('tbl-hoffmann').innerHTML = hHtml;
+  document.getElementById('h-tbl-sub').textContent  = `${coffeeStr} coffee · ${waterStr} water`;
+  document.getElementById('h-tbl-foot').textContent = `Total: ${waterStr} · Bloom: ${hBloom}g · Main: ${hMain}g · Drawdown ~3:30`;
+  document.getElementById('h-coffee').textContent = coffeeStr;
+  document.getElementById('h-water').textContent  = waterStr;
+
+  // ── RAO ──
+  const rBloom = Math.round(coffee * 3);
+  const rMain  = water - rBloom;
+  let rHtml = '', rCum = 0;
+  [[rBloom,'0:00','Excavated bloom — stir & dig in'],[rMain,'0:30','Continuous pour → 1:30']].forEach(([g,t,n],i) => {
+    rCum += g;
+    rHtml += row(i+1, g, rCum, water, t, n, false);
+  });
+  rHtml += row('↺','','','','~1:30','The Rao Spin — sharp confident swirl',true);
+  document.getElementById('tbl-rao').innerHTML = rHtml;
+  document.getElementById('r-tbl-sub').textContent  = `${coffeeStr} coffee · ${waterStr} water`;
+  document.getElementById('r-tbl-foot').textContent = `Total: ${waterStr} · Bloom: ${rBloom}g · Main: ${rMain}g · Drawdown ~3:00`;
+  document.getElementById('r-coffee').textContent = coffeeStr;
+  document.getElementById('r-water').textContent  = waterStr;
+
+  // ── WINTON ──
+  const wPer  = Math.round(water / 5);
+  const wLast = water - wPer * 4;
+  const wTimes = ['0:00','0:45','1:30','2:15','3:00'];
+  const wNotes = ['Drain fully before pour 2','Drain fully before pour 3','Drain fully before pour 4','Drain fully before pour 5','Final pour — drain by 3:30'];
+  let wHtml = '', wCum = 0;
+  for (let i = 0; i < 5; i++) {
+    const g = i < 4 ? wPer : wLast;
+    wCum += g;
+    wHtml += row(i+1, g, wCum, water, wTimes[i], wNotes[i], false);
+  }
+  document.getElementById('tbl-winton').innerHTML = wHtml;
+  document.getElementById('w-tbl-sub').textContent  = `${coffeeStr} coffee · ${waterStr} water`;
+  document.getElementById('w-tbl-foot').textContent = `Total: ${waterStr} · ${wPer}g per pour (5 equal) · Drawdown ~3:30`;
+  document.getElementById('w-coffee').textContent = coffeeStr;
+  document.getElementById('w-water').textContent  = waterStr;
+}
+
+function calcAndUpdate() {
+  const coffee = parseFloat(document.getElementById('coffeeInput').value) || 20;
+  const water  = Math.round(coffee * currentRatio);
+  const bloom  = Math.round(coffee * 2);
+  document.getElementById('res-water').textContent = water;
+  document.getElementById('res-bloom').textContent = bloom;
+  document.getElementById('res-main').textContent  = water - bloom;
+  document.getElementById('res-pour5').textContent = Math.round(water / 5);
+  document.getElementById('res-yield').textContent = Math.round(water * 0.85);
+  buildTables(coffee, water);
+}
+
+document.getElementById('coffeeInput').addEventListener('input', calcAndUpdate);
+document.getElementById('ratioPicker').addEventListener('click', function(e) {
+  const btn = e.target.closest('.ratio-btn');
+  if (!btn) return;
+  document.querySelectorAll('.ratio-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  currentRatio = parseInt(btn.dataset.ratio);
+  calcAndUpdate();
+});
+document.querySelectorAll('.recipe-tab').forEach(tab => {
+  tab.addEventListener('click', function() {
+    document.querySelectorAll('.recipe-tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.recipe-panel').forEach(p => p.classList.remove('active'));
+    this.classList.add('active');
+    document.getElementById('panel-' + this.dataset.panel).classList.add('active');
+  });
+});
+
+calcAndUpdate();
+</script>
+</body>
+</html>
