@@ -158,23 +158,57 @@
     border-left: 1px solid rgba(196,136,63,0.2);
     white-space: nowrap;
   }
-  .ratio-picker { display: flex; }
-  .ratio-btn {
-    flex: 1;
-    background: rgba(0,0,0,0.25);
-    border: 1px solid rgba(196,136,63,0.2);
-    border-right: none;
-    color: rgba(245,240,232,0.5);
-    font-family: var(--font-mono);
-    font-size: 0.75rem;
-    padding: 0.9rem 0.5rem;
-    cursor: pointer;
-    transition: all 0.15s;
-    text-align: center;
+  .slider-wrap {
+    display: flex;
+    align-items: center;
+    gap: 0.9rem;
+    margin-top: 0.75rem;
   }
-  .ratio-btn:last-child { border-right: 1px solid rgba(196,136,63,0.2); }
-  .ratio-btn:hover { background: rgba(196,136,63,0.1); color: var(--cream); }
-  .ratio-btn.active { background: var(--caramel); color: var(--espresso); font-weight: 500; border-color: var(--caramel); }
+  .slider-pole {
+    font-family: var(--font-mono);
+    font-size: 0.6rem;
+    letter-spacing: 0.06em;
+    color: rgba(245,240,232,0.3);
+    white-space: nowrap;
+  }
+  input[type="range"].brew-slider {
+    -webkit-appearance: none;
+    appearance: none;
+    flex: 1;
+    height: 3px;
+    background: rgba(196,136,63,0.2);
+    border-radius: 2px;
+    outline: none;
+    cursor: pointer;
+  }
+  input[type="range"].brew-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 15px;
+    height: 15px;
+    border-radius: 50%;
+    background: var(--caramel);
+    cursor: pointer;
+    transition: background 0.15s, transform 0.15s;
+  }
+  input[type="range"].brew-slider::-webkit-slider-thumb:hover {
+    background: var(--gold);
+    transform: scale(1.2);
+  }
+  input[type="range"].brew-slider::-moz-range-thumb {
+    width: 15px;
+    height: 15px;
+    border-radius: 50%;
+    background: var(--caramel);
+    border: none;
+    cursor: pointer;
+  }
+  .sliders-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+    margin-bottom: 2rem;
+  }
+  @media (max-width: 600px) { .sliders-row { grid-template-columns: 1fr; } }
 
   .calc-results {
     display: grid;
@@ -462,13 +496,29 @@
           </div>
         </div>
         <div class="input-group">
-          <label>Ratio (coffee : water)</label>
-          <div class="ratio-picker" id="ratioPicker">
-            <button class="ratio-btn" data-ratio="13">1:13</button>
-            <button class="ratio-btn" data-ratio="15">1:15</button>
-            <button class="ratio-btn active" data-ratio="16">1:16</button>
-            <button class="ratio-btn" data-ratio="17">1:17</button>
-            <button class="ratio-btn" data-ratio="18">1:18</button>
+          <label>Brew strength — <span id="ratio-display" style="color:var(--caramel)">1:16</span></label>
+          <div class="slider-wrap">
+            <span class="slider-pole">Stronger</span>
+            <input type="range" class="brew-slider" id="ratioSlider" min="13" max="18" step="0.5" value="16">
+            <span class="slider-pole">Lighter</span>
+          </div>
+        </div>
+      </div>
+      <div class="sliders-row">
+        <div class="input-group">
+          <label>Flavor — <span id="sweet-display" style="color:var(--caramel)">Balanced</span></label>
+          <div class="slider-wrap">
+            <span class="slider-pole">Sour / Bright</span>
+            <input type="range" class="brew-slider" id="sweetnessSlider" min="0" max="100" step="5" value="50">
+            <span class="slider-pole">Sweet / Smooth</span>
+          </div>
+        </div>
+        <div class="input-group">
+          <label>Body — <span id="body-display" style="color:var(--caramel)">Medium</span></label>
+          <div class="slider-wrap">
+            <span class="slider-pole">Light / Clean</span>
+            <input type="range" class="brew-slider" id="bodySlider" min="0" max="100" step="5" value="50">
+            <span class="slider-pole">Full / Rich</span>
           </div>
         </div>
       </div>
@@ -719,6 +769,23 @@
 
 <script>
 let currentRatio = 16;
+let currentSweetness = 50;
+let currentBody = 50;
+
+function sweetLabel(v) {
+  if (v <= 15) return 'Sour / Bright';
+  if (v <= 35) return 'Slightly bright';
+  if (v <= 65) return 'Balanced';
+  if (v <= 85) return 'Slightly sweet';
+  return 'Sweet / Smooth';
+}
+function bodyLabel(v) {
+  if (v <= 15) return 'Light / Clean';
+  if (v <= 35) return 'Light-medium';
+  if (v <= 65) return 'Medium';
+  if (v <= 85) return 'Medium-full';
+  return 'Full / Rich';
+}
 
 function row(num, pourG, cumG, totalG, time, note, special) {
   const pct = Math.round((pourG / totalG) * 100);
@@ -744,14 +811,17 @@ function row(num, pourG, cumG, totalG, time, note, special) {
   return `<tr>${numCell}${pourCell}${cumulCell}${timeCell}${noteCell}</tr>`;
 }
 
-function buildTables(coffee, water) {
+function buildTables(coffee, water, sweetness, body) {
   const coffeeStr = (Math.round(coffee * 10) / 10) + 'g';
   const waterStr  = water + 'g';
+
+  // sweetness 0–100 → kP1 ratio 0.65 (sour: big first pour) → 0.30 (sweet: small first pour)
+  const kP1Ratio = 0.65 - (sweetness / 100) * 0.35;
 
   // ── KASUYA ──
   const kFlavorTotal = Math.round(water * 0.4);
   const kStrengthTotal = water - kFlavorTotal;
-  const kP1 = Math.round(kFlavorTotal * 0.45);   // slightly smaller first pour (default sweet)
+  const kP1 = Math.round(kFlavorTotal * kP1Ratio);
   const kP2 = kFlavorTotal - kP1;
   const kPer = Math.round(kStrengthTotal / 3);
   const kP5 = kStrengthTotal - kPer * 2;
@@ -771,7 +841,9 @@ function buildTables(coffee, water) {
   document.getElementById('k-water').textContent  = waterStr;
 
   // ── HOFFMANN ──
-  const hBloom = Math.round(coffee * 2);
+  // body 0–100 → bloom multiplier 1.5 (light) → 2.5 (full)
+  const hBloomMult = 1.5 + (body / 100);
+  const hBloom = Math.round(coffee * hBloomMult);
   const hMain  = water - hBloom;
   let hHtml = '', hCum = 0;
   [[hBloom,'0:00','Bloom — swirl dripper immediately'],[hMain,'0:45','Continuous pour — finish by 1:30']].forEach(([g,t,n],i) => {
@@ -786,7 +858,9 @@ function buildTables(coffee, water) {
   document.getElementById('h-water').textContent  = waterStr;
 
   // ── RAO ──
-  const rBloom = Math.round(coffee * 3);
+  // body 0–100 → bloom multiplier 2 (light) → 4 (full)
+  const rBloomMult = 2 + (body / 50);
+  const rBloom = Math.round(coffee * rBloomMult);
   const rMain  = water - rBloom;
   let rHtml = '', rCum = 0;
   [[rBloom,'0:00','Excavated bloom — stir & dig in'],[rMain,'0:30','Continuous pour → 1:30']].forEach(([g,t,n],i) => {
@@ -827,16 +901,24 @@ function calcAndUpdate() {
   document.getElementById('res-main').textContent  = water - bloom;
   document.getElementById('res-pour5').textContent = Math.round(water / 5);
   document.getElementById('res-yield').textContent = Math.round(water * 0.85);
-  buildTables(coffee, water);
+  buildTables(coffee, water, currentSweetness, currentBody);
 }
 
 document.getElementById('coffeeInput').addEventListener('input', calcAndUpdate);
-document.getElementById('ratioPicker').addEventListener('click', function(e) {
-  const btn = e.target.closest('.ratio-btn');
-  if (!btn) return;
-  document.querySelectorAll('.ratio-btn').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
-  currentRatio = parseInt(btn.dataset.ratio);
+document.getElementById('ratioSlider').addEventListener('input', function() {
+  currentRatio = parseFloat(this.value);
+  const label = Number.isInteger(currentRatio) ? currentRatio : currentRatio.toFixed(1);
+  document.getElementById('ratio-display').textContent = '1:' + label;
+  calcAndUpdate();
+});
+document.getElementById('sweetnessSlider').addEventListener('input', function() {
+  currentSweetness = parseInt(this.value);
+  document.getElementById('sweet-display').textContent = sweetLabel(currentSweetness);
+  calcAndUpdate();
+});
+document.getElementById('bodySlider').addEventListener('input', function() {
+  currentBody = parseInt(this.value);
+  document.getElementById('body-display').textContent = bodyLabel(currentBody);
   calcAndUpdate();
 });
 document.querySelectorAll('.recipe-tab').forEach(tab => {
